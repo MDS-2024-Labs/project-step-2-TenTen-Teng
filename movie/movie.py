@@ -26,8 +26,13 @@ class Movie:
         self.header["Authorization"] += self.__TMDB_API_KEY
 
         # Test api connection.
-        self.test_api_connection(self.url, self.__TMDB_API_KEY)
+        if not self.test_api_connection(self.url, self.__TMDB_API_KEY):
+            raise ConnectionError()
 
+    @property
+    def get_TMDB_key(self):
+        return self.__TMDB_API_KEY
+    
     def movie_search(
             self, movie_name:str=None, user_preference:dict={}) -> list:
         """Search movie inforamtion from TMDB by calling API using user input.
@@ -40,11 +45,20 @@ class Movie:
         Returns:
             list: A list of movies information related to user input.
         """
+
+        assert (
+            movie_name and type(movie_name) == str
+            ), "Please provide a valid movie name."
+
         mv_basic_response = self.fetch_movie(movie_name)
+
+        num_results = user_preference.get("num_results", 3)
+        movie_genre = user_preference.get("movie_genre", None)
+
         movies = self.movie_parse_response(
             movie_response=mv_basic_response,
-            num_results=user_preference["num_results"],
-            genre_preference=user_preference["movie_genre"]
+            num_results=num_results,
+            genre_preference=movie_genre
             )
 
         return movies
