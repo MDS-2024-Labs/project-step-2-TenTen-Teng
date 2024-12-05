@@ -63,7 +63,7 @@ class Movie:
 
         return movies
 
-    def fetch_movie(self, movie_name:str=None) -> dict[str:any]:
+    def fetch_movie(self, movie_name:str="") -> dict[str:any]:
         """Fetch basic movie information.
 
         Returns:
@@ -77,12 +77,12 @@ class Movie:
             # Remove blank space and replace them to %20.
             movie_name = movie_name.replace(" ", "%20")
 
-            query = f"{self.url}{endpoint}?query={movie_name}\
-                &language=en-US&page=1"
-            mv_basic_response = requests.get(query, headers=self.header)
+            self.search_query = f"{self.url}{endpoint}?query={movie_name}"\
+                "&language=en-US&page=1"
+            mv_basic_response = requests.get(
+                self.search_query, headers=self.header)
 
             if mv_basic_response.status_code == 200:
-                # print("Data fetched successfully!")
                 mv_basic_response = mv_basic_response.json()
                 return mv_basic_response
             else:
@@ -90,7 +90,7 @@ class Movie:
                     f"Failed to fetch data. HTTP status code: \
                         {mv_basic_response.status_code}"
                     )
-                print("Response:", mv_basic_response.json())
+                print(f"Response: {mv_basic_response.json()}")
         except requests.exceptions.RequestException as e:
             print(f"Error during API request: {e}")
         return None
@@ -110,8 +110,9 @@ class Movie:
             endpoint = self.config["collection_endpoint"] \
                 .replace("MOVIE_ID", str(id))
 
-            query = f"{self.url}{endpoint}"
-            mv_col_response = requests.get(query, headers=self.header)
+            self.collection_query = f"{self.url}{endpoint}"
+            mv_col_response = requests.get(
+                self.collection_query, headers=self.header)
 
             if mv_col_response.status_code == 200:
                 # print("Data fetched successfully!")
